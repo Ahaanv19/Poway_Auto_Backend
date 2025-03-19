@@ -26,21 +26,11 @@ from api.mod import section_api
 from api.nestPost import nestPost_api
 from api.messages_api import messages_api
 from api.carphoto import car_api
-from api.dewey import dewy_api
-from api.ahaan import ahaan_api
 from api.student import student_api
 from api.preferences import preferences_api
 from api.chat import chat_api
-from api.bookadaptation import bookadaptation_api
 from api.vote import vote_api
-from api.bookadaptationsdb import books_api
-from api.booking import booking_api
-from api.bookquotesdb import quotes_api
-from api.litawardsdb import awards_api  # New import for Literary Awards API
-from api.lib import lib_api
 from api.sections import sections_bp
-from api.favoriteBooks import favbook_api
-from api.bookProgress import book_progress_api
 
 # database Initialization functions
 from model.carChat import CarChat
@@ -51,12 +41,6 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts
 from model.vote import Vote, initVotes
-from model.bookadaptationsdb import Book, initBookAdaptations
-from model.booking import Booking, initbooking
-from model.bookquotesdb import Quote, initQuotes
-from model.litawardsdb import LiteraryAward, initLiteraryAwards  # New imports for Literary Awards
-from model.favoriteBooks import FavoriteBook, initFavoriteBooks
-from model.bookProgress import BookProgress, initBookProgress
 
 main = Flask(__name__)
 CORS(main, origins=["https://ahaanv19.github.io"], supports_credentials=True)
@@ -70,24 +54,14 @@ app.register_blueprint(user_api)
 app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(sections_bp)
-app.register_blueprint(dewy_api)
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
-app.register_blueprint(ahaan_api)
 app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
-app.register_blueprint(bookadaptation_api)
-app.register_blueprint(booking_api)
-app.register_blueprint(books_api)
-app.register_blueprint(quotes_api)
-app.register_blueprint(awards_api)  # New registration for Literary Awards API
-app.register_blueprint(lib_api)
-app.register_blueprint(favbook_api)
-app.register_blueprint(book_progress_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -222,36 +196,6 @@ def generate_data():
     except Exception as e:
         print(f"Error in initVotes: {e}")
 
-    try:
-        initBookAdaptations()
-    except Exception as e:
-        print(f"Error in initBookAdaptations: {e}")
-
-    try:
-        initbooking()
-    except Exception as e:
-        print(f"Error in initbooking: {e}")
-
-    try:
-        initQuotes()
-    except Exception as e:
-        print(f"Error in initQuotes: {e}")
-
-    try:
-        initLiteraryAwards() 
-    except Exception as e:
-        print(f"Error in initLiteraryAwards: {e}")
-    
-    try:
-        initFavoriteBooks()
-    except Exception as e:
-        print(f"Error in initFavoriteBooks: {e}")
-
-    try:
-        initBookProgress()
-    except Exception as e:
-        print(f"Error in initBookProgress: {e}")
-
 # Backup the old database
 def backup_database(db_uri, backup_uri):
     """Backup the current database."""
@@ -272,10 +216,6 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
-        data['books'] = [books.read() for books in Book.query.all()]
-        data['booking'] = [book.read() for book in Booking.query.all()]
-        data['quotes'] = [quote.read() for quote in Quote.query.all()]
-        data['literary_awards'] = [award.read() for award in LiteraryAward.query.all()] 
     return data
 
 # Save extracted data to JSON files
@@ -306,10 +246,6 @@ def restore_data(data):
         _ = Group.restore(data.get('groups', []), users)
         _ = Channel.restore(data.get('channels', []))
         _ = Post.restore(data.get('posts', []))
-        _ = Book.restore(data.get('books', []))
-        _ = Booking.restore(data.get('booking', []))
-        _ = Quote.restore(data.get('quotes', [])) 
-        _ = LiteraryAward.restore(data.get('literary_awards', []))  # New restoration
     print("Data restored to the new database.")
 
 # Define a command to backup data
