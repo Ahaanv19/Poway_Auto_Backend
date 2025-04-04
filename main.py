@@ -32,7 +32,7 @@ from api.chat import chat_api
 from api.vote import vote_api
 from api.sections import sections_bp
 from api.route import routes_bp
-
+from api.savedLocations import savedlocation_api
 
 # database Initialization functions
 from model.carChat import CarChat
@@ -43,6 +43,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts
 from model.vote import Vote, initVotes
+from model.savedLocations import SavedLocation, initSavedLocations
 
 main = Flask(__name__)
 CORS(main, origins=["https://ahaanv19.github.io"], supports_credentials=True)
@@ -64,8 +65,7 @@ app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
-app.register_blueprint(routes_bp)
-
+app.register_blueprint(savedlocation_api, url_prefix='/api')
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -199,6 +199,11 @@ def generate_data():
         initVotes()
     except Exception as e:
         print(f"Error in initVotes: {e}")
+    
+    try:
+        initSavedLocations()
+    except Exception as e:
+        print(f"Error in initSavedLocations: {e}")
 
 # Backup the old database
 def backup_database(db_uri, backup_uri):
