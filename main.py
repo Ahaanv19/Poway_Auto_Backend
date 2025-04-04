@@ -31,6 +31,8 @@ from api.preferences import preferences_api
 from api.chat import chat_api
 from api.vote import vote_api
 from api.sections import sections_bp
+from api.route import routes_bp
+
 
 # database Initialization functions
 from model.carChat import CarChat
@@ -62,6 +64,8 @@ app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
+app.register_blueprint(routes_bp)
+
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -266,4 +270,4 @@ app.cli.add_command(custom_cli)
         
 # this runs the flask application on the development server
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8103)
+    app.run(debug=True, host="0.0.0.0", port=8888)
