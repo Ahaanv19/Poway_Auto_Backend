@@ -32,7 +32,7 @@ from api.chat import chat_api
 from api.vote import vote_api
 from api.sections import sections_bp
 from api.route import routes_bp
-from api.savedLocations import savedlocation_api
+from api.savedLocations import savedLocations_api
 
 # database Initialization functions
 from model.carChat import CarChat
@@ -43,7 +43,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts
 from model.vote import Vote, initVotes
-from model.savedLocations import SavedLocation, initSavedLocations
+from model.savedLocations import SavedLocations, initSavedLocations
 
 main = Flask(__name__)
 CORS(main, origins=["https://ahaanv19.github.io"], supports_credentials=True)
@@ -65,7 +65,7 @@ app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
-app.register_blueprint(savedlocation_api, url_prefix='/api')
+app.register_blueprint(savedLocations_api, url_prefix='/api')
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -225,6 +225,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['locations'] = [post.read() for post in SavedLocations.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -239,7 +240,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'books', 'booking', 'quotes', 'literary_awards']:  # New entry
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'locations']:  # New entry
         try:
             with open(os.path.join(directory, f'{table}.json'), 'r') as f:
                 data[table] = json.load(f)
@@ -255,6 +256,7 @@ def restore_data(data):
         _ = Group.restore(data.get('groups', []), users)
         _ = Channel.restore(data.get('channels', []))
         _ = Post.restore(data.get('posts', []))
+        _ = SavedLocations.restore(data.get('locations', []))
     print("Data restored to the new database.")
 
 # Define a command to backup data
