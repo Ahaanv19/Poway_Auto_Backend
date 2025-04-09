@@ -3,7 +3,8 @@ import requests
 from flask_cors import CORS
 
 routes_bp = Blueprint('routes', __name__)
-CORS(routes_bp)  # Enable CORS for this blueprint
+CORS(routes_bp, supports_credentials=True, methods=["GET", "POST", "OPTIONS"])
+
 
 # Google Maps API Key (replace with your key)
 API_KEY = 'AIzaSyDdw-OCP9d_GcwoVyX8EEWrdc4Mrz_D9ag'

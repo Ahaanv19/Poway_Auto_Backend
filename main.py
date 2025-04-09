@@ -45,8 +45,9 @@ from model.nestPost import NestPost, initNestPosts
 from model.vote import Vote, initVotes
 from model.savedLocations import SavedLocations, initSavedLocations
 
-main = Flask(__name__)
-CORS(main, origins=["https://ahaanv19.github.io"], supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True, methods=["GET", "POST", "OPTIONS"])
+
+
 
 # server only View
 
