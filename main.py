@@ -45,9 +45,6 @@ from model.nestPost import NestPost, initNestPosts
 from model.vote import Vote, initVotes
 from model.savedLocations import SavedLocations, initSavedLocations
 
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True, methods=["GET", "POST", "OPTIONS"])
-
-
 
 # server only View
 
@@ -66,7 +63,7 @@ app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
-app.register_blueprint(savedLocations_api, url_prefix='/api')
+app.register_blueprint(savedLocations_api)  # Registering favoriteBooks API
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -204,7 +201,7 @@ def generate_data():
     try:
         initSavedLocations()
     except Exception as e:
-        print(f"Error in initSavedLocations: {e}")
+        print(f"Error in initFavoriteBooks: {e}")
 
 # Backup the old database
 def backup_database(db_uri, backup_uri):
