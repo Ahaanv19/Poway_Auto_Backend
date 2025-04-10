@@ -31,7 +31,7 @@ from api.preferences import preferences_api
 from api.chat import chat_api
 from api.vote import vote_api
 from api.sections import sections_bp
-from api.route import routes_bp
+from api.route import routes_api 
 from api.savedLocations import savedLocations_api
 
 # database Initialization functions
@@ -62,6 +62,7 @@ app.register_blueprint(car_api)
 app.register_blueprint(student_api)
 app.register_blueprint(preferences_api)
 app.register_blueprint(post_api, url_prefix='/api')
+app.register_blueprint(routes_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
 app.register_blueprint(savedLocations_api)  # Registering favoriteBooks API
 
