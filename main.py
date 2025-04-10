@@ -201,7 +201,7 @@ def generate_data():
     try:
         initSavedLocations()
     except Exception as e:
-        print(f"Error in initFavoriteBooks: {e}")
+        print(f"Error in initSavedLocations: {e}")
 
 # Backup the old database
 def backup_database(db_uri, backup_uri):
