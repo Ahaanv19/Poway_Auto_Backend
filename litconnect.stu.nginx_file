@@ -1,20 +1,19 @@
 server {
     listen 80;
     listen [::]:80;
-    server_name flocker.nighthawkcodingsociety.com ; # Change server name to the one on R53
-    # Configure CORS Headers
+    server_name autonomous.stu.nighthawkcodingsociety.com.stu.nighthawkcodingsociety.com;
     location / { 
-        proxy_pass http://localhost:8888; # Change port to port on docker
-        # Simple requests
-        if ($request_method ~* "(GET|POST|PUT|DELETE)") { # Customize Request methods based on your needs
-                add_header "Access-Control-Allow-Origin"  *;
-        }
-        # Preflighted requests 
+        proxy_pass http://localhost:8888;
+        proxy_pass http://127.0.0.1:4887;
         if ($request_method = OPTIONS ) {
-                add_header "Access-Control-Allow-Origin"  *;
-                add_header "Access-Control-Allow-Methods" "GET, POST, PUT, DELETE, OPTIONS, HEAD"; # Make sure the request methods above match here
-                add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
-                return 200;
+                add_header "Access-Control-Allow-Credentials" "true" always;
+                add_header "Access-Control-Allow-Origin" "https://ahaanv19.github.io/" always;
+                add_header "Access-Control-Allow-Origin" "http://localhost:8888" always;
+                add_header "Access-Control-Allow-Origin" "http://127.0.0.1:4887" always;
+                add_header "Access-Control-Allow-Methods" "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+                add_header "Access-Control-Allow-MaxAge" 600 always
+                add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Origin, X-Requested-With, Content-Type, Accept" always;
+                return 204;
+                }
         }
     }
-}
