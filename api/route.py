@@ -1,6 +1,5 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
-from api.jwt_authorize import token_required
 import requests
 
 # Define Blueprint for modularizing the route API
@@ -61,7 +60,8 @@ class RoutesAPI:
                     route_info.append({
                         'details': route_details,
                         'total_duration': route['legs'][0]['duration']['text'],
-                        'total_distance': route['legs'][0]['distance']['text']
+                        'total_distance': route['legs'][0]['distance']['text'],
+                        'geometry': route['overview_polyline']['points']  # Include the polyline geometry
                     })
 
                 return jsonify(route_info)
