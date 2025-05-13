@@ -2,42 +2,33 @@ from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
 import requests
 
-# Define Blueprint for modularizing the route API
+# Define Blueprint
 routes_api = Blueprint('routes', __name__, url_prefix='/api')
-
-# Attach RESTful API to the Blueprint
 api = Api(routes_api)
 
-# Google Maps API Key (replace with your key)
 API_KEY = 'AIzaSyDdw-OCP9d_GcwoVyX8EEWrdc4Mrz_D9ag'
 
 class RoutesAPI:
-    """
-    Define the API endpoint for retrieving routes using Google Maps Directions API.
-    """
-
     class _GetRoutes(Resource):
         def post(self):
-            # Parse request JSON
             data = request.get_json()
             origin = data.get('origin')
             destination = data.get('destination')
+            mode = data.get('mode', 'driving')  # Default to driving if not provided
 
-            # Validate inputs
             if not origin or not destination:
                 return jsonify({'error': 'Origin and destination are required'}), 400
 
             # Construct Google Maps API URL
             url = (
                 f"https://maps.googleapis.com/maps/api/directions/json?"
-                f"origin={origin}&destination={destination}&alternatives=true&key={API_KEY}"
+                f"origin={origin}&destination={destination}&mode={mode}"
+                f"&alternatives=true&key={API_KEY}"
             )
 
-            # Make request to Google Maps Directions API
             response = requests.get(url)
             data = response.json()
 
-            # Process response
             if data['status'] == 'OK':
                 routes = data['routes']
                 route_info = []
@@ -61,13 +52,11 @@ class RoutesAPI:
                         'details': route_details,
                         'total_duration': route['legs'][0]['duration']['text'],
                         'total_distance': route['legs'][0]['distance']['text'],
-                        'geometry': route['overview_polyline']['points']  # Include the polyline geometry
+                        'geometry': route['overview_polyline']['points']
                     })
 
                 return jsonify(route_info)
 
-            # Error case
             return jsonify({'error': data.get('status', 'No routes found')}), 500
 
-    # Map the _GetRoutes class to the API endpoint
     api.add_resource(_GetRoutes, '/get_routes')
