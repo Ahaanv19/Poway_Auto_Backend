@@ -20,14 +20,23 @@ class EntryResource(Resource):
         return {"message": "Entry added"}, 200
 
     def get(self):
-        # Backend role check (from session or user object)
-        user = session.get("user")  # Assume user stored like: {"email": ..., "role": "admin"}
-        if not user or user.get("role") != "admin":
+        user = session.get("user")  # Expected: {"email": ..., "role": "Admin"}
+        if not user or user.get("role", "").lower() != "admin":
             return {"error": "Access denied"}, 403
 
         return jsonify(entries)
 
+# Optional: API to expose current user info for frontend role-based logic
+class SessionInfo(Resource):
+    def get(self):
+        user = session.get("user")
+        if not user:
+            return {"error": "Not logged in"}, 401
+        return {"email": user.get("email"), "role": user.get("role")}, 200
+
 api.add_resource(EntryResource, '/entries')
+api.add_resource(SessionInfo, '/userinfo')
+
 
 
 
