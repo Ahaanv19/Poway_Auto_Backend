@@ -14,8 +14,10 @@ class VerifyLocationAPI:
             lat = data.get("latitude")
             lng = data.get("longitude")
 
+            print(f"[DEBUG] Received lat/lng: {lat}, {lng}")  # Optional debug
+
             if lat is None or lng is None:
-                return jsonify({'valid': False, 'message': 'Coordinates required'}), 400
+                return jsonify({'error': 'Coordinates required'}), 400
 
             url = (
                 f"https://maps.googleapis.com/maps/api/geocode/json?"
@@ -26,20 +28,27 @@ class VerifyLocationAPI:
                 res = requests.get(url)
                 geodata = res.json()
 
-                if geodata['status'] != 'OK':
-                    return jsonify({'valid': False, 'message': 'Failed to retrieve location'}), 400
+                if geodata.get('status') != 'OK':
+                    return jsonify({'error': 'Failed to retrieve location'}), 400
 
-                for component in geodata['results'][0]['address_components']:
-                    if 'locality' in component['types']:
-                        city = component['long_name']
-                        if city.strip().lower() == 'poway':
-                            return jsonify({'valid': True, 'message': 'You are in Poway!'})
-                        break
+                results = geodata.get('results', [])
+                if not results:
+                    return jsonify({'error': 'No address found'}), 400
 
-                return jsonify({'valid': False, 'message': 'You must be in Poway to access this site.'})
+                for result in results:
+                    for component in result.get('address_components', []):
+                        if 'locality' in component['types']:
+                            city = component['long_name']
+                            print(f"[DEBUG] Found city: {city}")
+                            if city.lower() == 'poway':
+                                return jsonify({'valid': True, 'message': 'You are in Poway'})
+                            break
+
+                return jsonify({'valid': False, 'message': 'You are not in Poway'})
 
             except Exception as e:
-                return jsonify({'valid': False, 'message': f'Server error: {str(e)}'}), 500
+                print("Exception during location verification:", e)
+                return jsonify({'error': 'Internal server error'}), 500
 
     api.add_resource(_Verify, '/verify_location')
 
