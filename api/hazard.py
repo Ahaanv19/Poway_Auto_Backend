@@ -1,41 +1,33 @@
 from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
-import time
 
-hazard_api = Blueprint('hazard_api', __name__, url_prefix='/api/hazard')
-api = Api(hazard_api)
+hazards_api = Blueprint('hazards_api', __name__, url_prefix='/api')
+api = Api(hazards_api)
 
-# In-memory hazard store (lat, lng, type, note, timestamp)
-hazards = []
+# In-memory hazard store
+hazard_store = []
 
-class HazardReportAPI:
-    class _Post(Resource):
+class HazardAPI:
+    class _Hazard(Resource):
+        def get(self):
+            return jsonify(hazard_store)
+
         def post(self):
             data = request.get_json()
             lat = data.get("latitude")
             lng = data.get("longitude")
-            hazard_type = data.get("type")
-            note = data.get("note", "")
+            description = data.get("description")
 
-            if not all([lat, lng, hazard_type]):
-                return jsonify({'error': 'Missing fields'}), 400
+            if not all([lat, lng, description]):
+                return {"error": "Missing required fields"}, 400
 
             hazard = {
                 "latitude": lat,
                 "longitude": lng,
-                "type": hazard_type,
-                "note": note,
-                "timestamp": time.time()
+                "description": description
             }
-            hazards.append(hazard)
-            return jsonify({'message': 'Hazard reported successfully'})
 
-    class _List(Resource):
-        def get(self):
-            # Auto-expire hazards older than 30 min
-            now = time.time()
-            fresh_hazards = [h for h in hazards if now - h["timestamp"] <= 1800]
-            return jsonify(fresh_hazards)
+            hazard_store.append(hazard)
+            return jsonify({"message": "Hazard reported successfully"})
 
-    api.add_resource(_Post, '/report')
-    api.add_resource(_List, '/all')
+    api.add_resource(_Hazard, '/hazards')
