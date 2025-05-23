@@ -1,21 +1,22 @@
-# backend/live_traffic.py
 from flask import Blueprint, request, jsonify
 
-live_traffic_api = Blueprint('live_traffic', __name__, url_prefix='/api')
-incidents = []  # In-memory storage
+incident_api = Blueprint('incident_api', __name__, url_prefix='/api')
+incidents = []  # In-memory storage (replace with DB later)
 
-@live_traffic_api.route('/report_incident', methods=['POST'])
+@incident_api.route('/incidents', methods=['POST'])
 def report_incident():
     data = request.get_json()
-    description = data.get("description")
-    location = data.get("location")
+    if not data.get('location') or not data.get('type'):
+        return jsonify({'error': 'Location and type are required'}), 400
 
-    if not description or not location:
-        return jsonify({"error": "Missing data"}), 400
+    incidents.append({
+        'location': data['location'],
+        'type': data['type'],
+        'details': data.get('details', '')
+    })
+    return jsonify({'message': 'Incident reported successfully'})
 
-    incidents.append({"description": description, "location": location})
-    return jsonify({"message": "Incident reported successfully"}), 200
-
-@live_traffic_api.route('/incidents', methods=['GET'])
+@incident_api.route('/incidents', methods=['GET'])
 def get_incidents():
-    return jsonify(incidents), 200
+    return jsonify(incidents)
+
