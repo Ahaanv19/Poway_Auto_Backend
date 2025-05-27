@@ -34,7 +34,7 @@ from api.sections import sections_bp
 from api.route import routes_api 
 from api.savedLocations import savedLocations_api
 from api.verify import verify_api
-from api.live import live_traffic_api
+from api.live import incident_api
 
 # database Initialization functions
 from model.carChat import CarChat
@@ -68,7 +68,7 @@ app.register_blueprint(routes_api, url_prefix='/api')
 app.register_blueprint(chat_api, url_prefix='/api')
 app.register_blueprint(savedLocations_api)  # Registering favoriteBooks API
 app.register_blueprint(verify_api)
-app.register_blueprint(live_traffic_api)
+app.register_blueprint(incident_api)
 
 
 # Tell Flask-Login the view function name of your login route
