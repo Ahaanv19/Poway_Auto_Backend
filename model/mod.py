@@ -134,12 +134,12 @@ def initSections():
         db.create_all()
         """Tester data for table"""
        
-        s1 = Section(name='Authors') 
-        s2 = Section(name='BookClubHub')
-        s3 = Section(name='General')
-        s4 = Section(name='Moderators')
-        s5 = Section(name='LitConnect')
-        s6 = Section(name='Book Reviews')
+        s1 = Section(name='Lake Poway Family Campout') 
+        s2 = Section(name='Mahjong')
+        s3 = Section(name='Line Dancing with Duffy')
+        s4 = Section(name='Summer Movies In The Park Series: Moana 2')
+        s5 = Section(name='Lake Poway Family Campout')
+        s6 = Section(name='2025 Summer Concert Series Pomerado Community Band')
         sections = [s1, s2, s3, s4, s5, s6]
         
         for section in sections:
