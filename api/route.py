@@ -1,39 +1,47 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask_restful import Api, Resource
 import requests
 import re
-from .traffic import get_average_speed
+from .traffic import get_average_speed  # Optional: only if you're using real traffic data
 
+# Blueprint and API init
 routes_api = Blueprint('routes', __name__, url_prefix='/api')
 api = Api(routes_api)
 
-API_KEY = 'AIzaSyDdw-OCP9d_GcwoVyX8EEWrdc4Mrz_D9ag'
+# Replace with your actual API key
+API_KEY = 'AIzaSyC0qOeOkWMCMxT0bMAdpQzZesBsZ-zaFOM'
 
+# Helper function to strip HTML tags from instructions
 def strip_html(text):
     return re.sub(r'<[^>]*>', '', text)
 
 class RoutesAPI:
     class _GetRoutes(Resource):
         def post(self):
-            data = request.get_json()
-            origin = data.get('origin')
-            destination = data.get('destination')
-            mode = data.get('mode', 'driving')
+            try:
+                data = request.get_json()
+                origin = data.get('origin')
+                destination = data.get('destination')
+                mode = data.get('mode', 'driving')
 
-            if not origin or not destination:
-                return jsonify({'error': 'Origin and destination are required'}), 400
+                if not origin or not destination:
+                    return {'error': 'Origin and destination are required'}, 400
 
-            url = (
-                f"https://maps.googleapis.com/maps/api/directions/json?"
-                f"origin={origin}&destination={destination}&alternatives=true"
-                f"&mode={mode}&key={API_KEY}"
-            )
+                # Request to Google Directions API
+                url = (
+                    f"https://maps.googleapis.com/maps/api/directions/json?"
+                    f"origin={origin}&destination={destination}&alternatives=true"
+                    f"&mode={mode}&key={API_KEY}"
+                )
 
-            response = requests.get(url)
-            data = response.json()
+                response = requests.get(url)
+                directions_data = response.json()
 
-            if data['status'] == 'OK':
-                routes = data['routes']
+                # Handle failed directions response
+                if directions_data.get('status') != 'OK':
+                    return {'error': directions_data.get('status', 'Unknown error')}, 500
+
+                routes = directions_data['routes']
                 route_info = []
 
                 for route in routes:
@@ -42,13 +50,12 @@ class RoutesAPI:
                     total_duration_sec = 0
 
                     for step in steps:
-                        instruction_html = step['html_instructions']
-                        instruction = strip_html(instruction_html)
+                        instruction = strip_html(step['html_instructions'])
                         distance = step['distance']['text']
                         duration = step['duration']['text']
                         duration_val = step['duration']['value']
-
                         total_duration_sec += duration_val
+
                         route_details.append({
                             'instruction': instruction,
                             'distance': distance,
@@ -56,7 +63,7 @@ class RoutesAPI:
                         })
 
                     total_duration_min = total_duration_sec / 60
-                    adjusted = total_duration_min * 0.85  # Placeholder for dataset logic
+                    adjusted = total_duration_min * 0.85  # Replace with dataset logic if needed
 
                     route_info.append({
                         'details': route_details,
@@ -66,11 +73,16 @@ class RoutesAPI:
                         'geometry': route['overview_polyline']['points']
                     })
 
-                return jsonify(route_info)
+                # Return route data directly — Flask-RESTful auto-converts to JSON
+                return route_info, 200
 
-            return jsonify({'error': data.get('status', 'No routes found')}), 500
+            except Exception as e:
+                # Return error safely
+                return {'error': str(e)}, 500
 
+    # Route registration
     api.add_resource(_GetRoutes, '/get_routes')
+
 
 
 
